@@ -31,7 +31,12 @@ class AdminMiddleware
             ]);
         }
 
-        // Check specific permission if provided
+        // Admin role has all permissions - bypass permission check
+        if ($admin->isAdmin()) {
+            return $next($request);
+        }
+
+        // Check specific permission if provided for non-admin users
         if ($permission && !$admin->hasPermission($permission)) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Forbidden'], 403);

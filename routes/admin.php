@@ -48,7 +48,7 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     
     // User Management
-    Route::middleware('admin:users.manage')->group(function () {
+    Route::middleware('admin')->group(function () {
         // General Users
         Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
         Route::get('/users/create', [UserManagementController::class, 'create'])->name('users.create');
@@ -87,7 +87,7 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     });
     
     // Content Management
-    Route::middleware('admin:content.moderate')->group(function () {
+    Route::middleware('admin')->group(function () {
         // Jobs
         Route::get('/jobs', [JobController::class, 'index'])->name('jobs.index');
         Route::get('/jobs/{job}', [JobController::class, 'show'])->name('jobs.show');
@@ -111,7 +111,7 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     });
     
     // System Configuration
-    Route::middleware('admin:system.configure')->group(function () {
+    Route::middleware('admin')->group(function () {
         // Settings
         Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
         Route::get('/settings/job-types', [SettingsController::class, 'jobTypes'])->name('settings.job-types');
@@ -130,7 +130,7 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     });
     
     // Subscription Management
-    Route::middleware('admin:subscriptions.manage')->group(function () {
+    Route::middleware('admin')->group(function () {
         Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
         Route::get('/subscriptions/{subscription}', [SubscriptionController::class, 'show'])->name('subscriptions.show');
         Route::post('/subscriptions/{subscription}/update-status', [SubscriptionController::class, 'updateStatus'])->name('subscriptions.update-status');
@@ -146,7 +146,7 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     });
     
     // Analytics
-    Route::middleware('admin:analytics.view')->group(function () {
+    Route::middleware('admin')->group(function () {
         Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
         Route::get('/analytics/system-stats', [AnalyticsController::class, 'systemStats'])->name('analytics.system-stats');
         Route::get('/analytics/user-growth', [AnalyticsController::class, 'userGrowth'])->name('analytics.user-growth');
@@ -156,7 +156,7 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     });
     
     // Reports
-    Route::middleware('admin:analytics.view')->group(function () {
+    Route::middleware('admin')->group(function () {
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
         Route::post('/reports/user-activity', [ReportController::class, 'userActivity'])->name('reports.user-activity');
         Route::post('/reports/job-performance', [ReportController::class, 'jobPerformance'])->name('reports.job-performance');

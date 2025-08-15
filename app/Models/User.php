@@ -122,17 +122,17 @@ class User extends Authenticatable
 
     /**
      * Check if user has permission
-     * For now, admins have all permissions
+     * Admin role has ALL permissions
      */
     public function hasPermission(string $permission): bool
     {
-        // Admin has all permissions
-        if ($this->isAdmin()) {
+        // Admin has ALL permissions - always return true
+        if ($this->role === 'admin') {
             return true;
         }
 
         // Add more granular permission logic here if needed
-        // For now, we'll use role-based permissions
+        // For now, we'll use role-based permissions for other roles
         $rolePermissions = [
             'company' => [
                 'jobs.create', 'jobs.edit', 'jobs.delete',
