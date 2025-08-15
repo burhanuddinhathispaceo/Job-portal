@@ -22,9 +22,34 @@
 
     <!-- Custom Admin Styles -->
     <style>
+        @php
+            $theme = \App\Models\WebsiteSetting::getValue('theme', 'light');
+            $primaryColor = \App\Models\WebsiteSetting::getValue('primary_color', '#667eea');
+            $secondaryColor = \App\Models\WebsiteSetting::getValue('secondary_color', '#764ba2');
+            $fontFamily = \App\Models\WebsiteSetting::getValue('font_family', 'Inter');
+        @endphp
+        
+        :root {
+            --primary-color: {{ $primaryColor }};
+            --secondary-color: {{ $secondaryColor }};
+            --font-family: '{{ $fontFamily }}', sans-serif;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            @if($theme === 'dark')
+            background-color: #1a1a1a;
+            color: #ffffff;
+            @endif
+        }
+        
         .admin-sidebar {
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            @if($theme === 'dark')
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+            @else
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            @endif
             position: fixed;
             top: 0;
             left: 0;
@@ -41,12 +66,65 @@
             margin-left: 250px;
             transition: all 0.3s;
             min-height: 100vh;
+            @if($theme === 'dark')
+            background-color: #2d3748;
+            @else
             background-color: #f8f9fa;
+            @endif
         }
         
         .admin-content.expanded {
             margin-left: 70px;
         }
+        
+        @if($theme === 'dark')
+        .card {
+            background-color: #4a5568;
+            border: 1px solid #718096;
+            color: #ffffff;
+        }
+        
+        .card-header {
+            background-color: #2d3748 !important;
+            border-bottom: 1px solid #718096;
+            color: #ffffff;
+        }
+        
+        .table-dark {
+            --bs-table-bg: #4a5568;
+            --bs-table-striped-bg: #2d3748;
+        }
+        
+        .form-control, .form-select {
+            background-color: #2d3748;
+            border: 1px solid #718096;
+            color: #ffffff;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background-color: #2d3748;
+            border-color: var(--primary-color);
+            color: #ffffff;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+        }
+        
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%) !important;
+        }
+        @else
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+        }
+        @endif
         
         .sidebar-brand {
             padding: 1rem;
