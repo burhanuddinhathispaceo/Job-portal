@@ -119,4 +119,63 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserActivity::class);
     }
+
+    /**
+     * Check if user has permission
+     * For now, admins have all permissions
+     */
+    public function hasPermission(string $permission): bool
+    {
+        // Admin has all permissions
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        // Add more granular permission logic here if needed
+        // For now, we'll use role-based permissions
+        $rolePermissions = [
+            'company' => [
+                'jobs.create', 'jobs.edit', 'jobs.delete',
+                'projects.create', 'projects.edit', 'projects.delete',
+                'applications.view', 'applications.manage',
+                'company.edit', 'company.view'
+            ],
+            'candidate' => [
+                'jobs.apply', 'projects.apply',
+                'profile.edit', 'profile.view',
+                'applications.view'
+            ]
+        ];
+
+        $userPermissions = $rolePermissions[$this->role] ?? [];
+        return in_array($permission, $userPermissions);
+    }
+
+    /**
+     * Check if user can access admin panel
+     */
+    public function canAccessAdmin(): bool
+    {
+        return $this->isAdmin();
+    }
+
+    /**
+     * Get user's full name
+     */
+    public function getFullNameAttribute(): string
+    {
+        if ($this->isCandidate() && $this->candidate) {
+            return $this->candidate->first_name . ' ' . $this->candidate->last_name;
+        }
+        return $this->name;
+    }
+
+    /**
+     * Get user's profile photo URL
+     */
+    public function getProfilePhotoUrlAttribute(): string
+    {
+        // Return default avatar for now
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF';
+    }
 }
