@@ -77,4 +77,32 @@ class Company extends Model
     {
         return $this->projects()->where('status', 'active');
     }
+
+    /**
+     * Get company subscriptions
+     */
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    /**
+     * Get current active subscription
+     */
+    public function currentSubscription()
+    {
+        return $this->subscriptions()
+                    ->where('status', 'active')
+                    ->where('end_date', '>=', now())
+                    ->latest()
+                    ->first();
+    }
+
+    /**
+     * Check if company has active subscription
+     */
+    public function hasActiveSubscription(): bool
+    {
+        return $this->currentSubscription() !== null;
+    }
 }
