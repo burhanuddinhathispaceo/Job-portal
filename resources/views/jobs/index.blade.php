@@ -65,28 +65,15 @@
                     </div>
                     <div class="card-body">
                         <form action="{{ route('jobs.index') }}" method="GET" id="filterForm">
-                            <!-- Job Type Filter -->
+                            <!-- Work Type Filter -->
                             <div class="filter-section mb-4">
-                                <h6 class="fw-semibold mb-3">Job Type</h6>
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" name="employment_type[]" value="full_time" 
-                                           {{ in_array('full_time', request('employment_type', [])) ? 'checked' : '' }}>
-                                    <label class="form-check-label">Full Time</label>
-                                </div>
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" name="employment_type[]" value="part_time"
-                                           {{ in_array('part_time', request('employment_type', [])) ? 'checked' : '' }}>
-                                    <label class="form-check-label">Part Time</label>
-                                </div>
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" name="employment_type[]" value="contract"
-                                           {{ in_array('contract', request('employment_type', [])) ? 'checked' : '' }}>
-                                    <label class="form-check-label">Contract</label>
-                                </div>
+                                <h6 class="fw-semibold mb-3">Work Type</h6>
                                 <div class="form-check mb-2">
                                     <input class="form-check-input" type="checkbox" name="employment_type[]" value="remote"
                                            {{ in_array('remote', request('employment_type', [])) ? 'checked' : '' }}>
-                                    <label class="form-check-label">Remote</label>
+                                    <label class="form-check-label">
+                                        <i class="fas fa-wifi me-1"></i>Remote Work
+                                    </label>
                                 </div>
                             </div>
 
@@ -211,9 +198,9 @@
                                                     <i class="fas fa-map-marker-alt"></i> {{ $job->location }}
                                                 </span>
                                             @endif
-                                            @if($job->employment_type)
+                                            @if($job->jobType)
                                                 <span class="job-tag">
-                                                    <i class="fas fa-clock"></i> {{ ucfirst(str_replace('_', ' ', $job->employment_type)) }}
+                                                    <i class="fas fa-briefcase"></i> {{ $job->jobType->name }}
                                                 </span>
                                             @endif
                                             @if($job->is_remote)
@@ -221,9 +208,26 @@
                                                     <i class="fas fa-wifi"></i> Remote
                                                 </span>
                                             @endif
-                                            @if($job->experience_level)
+                                            @if($job->experience_min || $job->experience_max)
                                                 <span class="job-tag">
-                                                    <i class="fas fa-star"></i> {{ ucfirst($job->experience_level) }} Level
+                                                    <i class="fas fa-star"></i> 
+                                                    @if($job->experience_min && $job->experience_max)
+                                                        {{ $job->experience_min }}-{{ $job->experience_max }} years
+                                                    @elseif($job->experience_min)
+                                                        {{ $job->experience_min }}+ years
+                                                    @else
+                                                        Up to {{ $job->experience_max }} years
+                                                    @endif
+                                                </span>
+                                            @endif
+                                            @if($job->visibility == 'featured')
+                                                <span class="job-tag featured">
+                                                    <i class="fas fa-star"></i> Featured
+                                                </span>
+                                            @endif
+                                            @if($job->visibility == 'highlighted')
+                                                <span class="job-tag highlighted">
+                                                    <i class="fas fa-bolt"></i> Highlighted
                                                 </span>
                                             @endif
                                         </div>
@@ -256,8 +260,10 @@
                 </div>
                 
                 <!-- Pagination -->
-                <div class="d-flex justify-content-center">
-                    {{ $jobs->withQueryString()->links() }}
+                <div class="d-flex justify-content-center mt-5">
+                    <div class="pagination-wrapper">
+                        {{ $jobs->withQueryString()->links() }}
+                    </div>
                 </div>
             @else
                 <div class="text-center py-5">
@@ -273,10 +279,35 @@
 
 @push('styles')
 <style>
+    @php
+        $primaryColor = \App\Models\WebsiteSetting::getValue('primary_color', '#667eea');
+        $secondaryColor = \App\Models\WebsiteSetting::getValue('secondary_color', '#764ba2');
+        $theme = \App\Models\WebsiteSetting::getValue('theme', 'light');
+    @endphp
+    
+    :root {
+        --primary-color: {{ $primaryColor }};
+        --secondary-color: {{ $secondaryColor }};
+        --gradient: linear-gradient(135deg, {{ $primaryColor }} 0%, {{ $secondaryColor }} 100%);
+        --gradient-light: linear-gradient(135deg, {{ $primaryColor }}15 0%, {{ $secondaryColor }}15 100%);
+    }
+    
+    body {
+        @if($theme === 'dark')
+        background-color: #1a1a1a;
+        color: #ffffff;
+        @else
+        background-color: #f8f9fa;
+        @endif
+    }
+    
     .hero-section {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: var(--gradient);
         position: relative;
         overflow: hidden;
+        min-height: 65vh;
+        display: flex;
+        align-items: center;
     }
     
     .hero-section::before {
@@ -286,7 +317,13 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M40 40c0-11.046-8.954-20-20-20s-20 8.954-20 20 8.954 20 20 20 20-8.954 20-20zm20 0c0-11.046-8.954-20-20-20s-20 8.954-20 20 8.954 20 20 20 20-8.954 20-20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        animation: float 20s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(5deg); }
     }
     
     .text-white-75 {
@@ -295,68 +332,276 @@
     
     .btn-white {
         background: white;
-        color: #667eea;
+        color: var(--primary-color);
         border: none;
         font-weight: 600;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        border-radius: 50px;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-white::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+        transition: left 0.5s;
+    }
+    
+    .btn-white:hover::before {
+        left: 100%;
     }
     
     .btn-white:hover {
         background: #f8f9fa;
-        color: #667eea;
-        transform: translateY(-2px);
+        color: var(--primary-color);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.2);
     }
     
     .search-form .input-group {
         border-radius: 50px;
         overflow: hidden;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+        backdrop-filter: blur(10px);
+    }
+    
+    .search-form .input-group-text {
+        border: none;
+        padding: 1rem 1.5rem;
+    }
+    
+    .search-form .form-control {
+        border: none;
+        padding: 1rem 1.5rem;
+        font-size: 1.1rem;
+    }
+    
+    .search-form .form-control:focus {
+        box-shadow: none;
     }
     
     .bg-gradient-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: var(--gradient) !important;
     }
+    
+    @if($theme === 'dark')
+    .card {
+        background-color: #2d3748;
+        border: 1px solid #4a5568;
+        color: #ffffff;
+    }
+    
+    .card-header {
+        background-color: #4a5568 !important;
+        border-bottom: 1px solid #718096;
+        color: #ffffff;
+    }
+    
+    .form-control, .form-select {
+        background-color: #4a5568;
+        border: 1px solid #718096;
+        color: #ffffff;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        background-color: #4a5568;
+        border-color: var(--primary-color);
+        color: #ffffff;
+        box-shadow: 0 0 0 0.2rem {{ $primaryColor }}25;
+    }
+    
+    .text-muted {
+        color: #a0aec0 !important;
+    }
+    
+    .text-dark {
+        color: #ffffff !important;
+    }
+    
+    .job-card {
+        background-color: #2d3748;
+        border: 1px solid #4a5568;
+    }
+    
+    .job-card:hover {
+        background-color: #4a5568;
+        border-color: var(--primary-color);
+    }
+    
+    .job-tag {
+        background: #4a5568;
+        color: #e2e8f0;
+    }
+    
+    .job-tag.remote {
+        background: #065f46;
+        color: #6ee7b7;
+    }
+    
+    .job-tag.featured {
+        background: #7c2d12;
+        color: #fed7aa;
+    }
+    
+    .job-tag.highlighted {
+        background: #7c2d12;
+        color: #fbbf24;
+    }
+    
+    .filters-sidebar .card {
+        background-color: #2d3748;
+        border: 1px solid #4a5568;
+    }
+    
+    .admin-header {
+        background-color: #2d3748 !important;
+        border-bottom: 1px solid #4a5568;
+    }
+    
+    .results-header h2 {
+        color: #ffffff;
+    }
+    @endif
     
     .job-card {
         transition: all 0.3s ease;
         border-radius: 15px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .job-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient);
+        opacity: 0;
+        transition: opacity 0.3s ease;
     }
     
     .job-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+        transform: translateY(-8px);
+        @if($theme === 'dark')
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3) !important;
+        @else
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
+        @endif
+    }
+    
+    .job-card:hover::before {
+        opacity: 1;
     }
     
     .company-logo {
-        width: 60px;
-        height: 60px;
+        width: 70px;
+        height: 70px;
         object-fit: cover;
-        border-radius: 12px;
+        border-radius: 16px;
+        transition: all 0.3s ease;
+    }
+    
+    .company-logo-wrapper {
+        position: relative;
     }
     
     .company-logo-wrapper .company-logo {
-        border: 2px solid #f8f9fa;
+        border: 3px solid {{ $theme === 'dark' ? '#4a5568' : '#f8f9fa' }};
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .job-card:hover .company-logo {
+        transform: scale(1.05);
+        border-color: var(--primary-color);
+    }
+    
+    .job-title a {
+        transition: all 0.3s ease;
+        position: relative;
     }
     
     .job-title a:hover {
-        color: #667eea !important;
+        color: var(--primary-color) !important;
+    }
+    
+    .job-title a::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -2px;
+        left: 0;
+        background: var(--gradient);
+        transition: width 0.3s ease;
+    }
+    
+    .job-title a:hover::after {
+        width: 100%;
     }
     
     .job-tag {
         display: inline-flex;
         align-items: center;
-        gap: 5px;
+        gap: 6px;
+        @if($theme === 'dark')
+        background: #4a5568;
+        color: #e2e8f0;
+        @else
         background: #f8f9fa;
         color: #6c757d;
-        padding: 4px 12px;
-        border-radius: 20px;
+        @endif
+        padding: 6px 14px;
+        border-radius: 25px;
         font-size: 0.875rem;
+        font-weight: 500;
         margin-right: 8px;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
+    }
+    
+    .job-tag:hover {
+        transform: translateY(-1px);
+        border-color: var(--primary-color);
     }
     
     .job-tag.remote {
+        @if($theme === 'dark')
+        background: #065f46;
+        color: #6ee7b7;
+        @else
         background: #e6fffa;
         color: #047481;
+        @endif
+    }
+    
+    .job-tag.featured {
+        @if($theme === 'dark')
+        background: #7c2d12;
+        color: #fed7aa;
+        @else
+        background: #fef3c7;
+        color: #d97706;
+        @endif
+    }
+    
+    .job-tag.highlighted {
+        @if($theme === 'dark')
+        background: #7c2d12;
+        color: #fbbf24;
+        @else
+        background: #fef3c7;
+        color: #d97706;
+        @endif
     }
     
     .filter-section {
@@ -370,7 +615,25 @@
     }
     
     .filters-sidebar .card {
-        border-radius: 15px;
+        border-radius: 20px;
+        border: none;
+        @if($theme === 'light')
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(10px);
+        @endif
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .filters-sidebar .card-header {
+        border-radius: 20px 20px 0 0;
+        border: none;
+        background: var(--gradient) !important;
+    }
+    
+    .filter-section {
+        border-bottom: 1px solid {{ $theme === 'dark' ? '#4a5568' : '#e9ecef' }};
+        padding-bottom: 1.5rem;
+        margin-bottom: 1.5rem;
     }
     
     .hover-lift:hover {
@@ -378,16 +641,84 @@
     }
     
     .results-header h2 {
+        @if($theme === 'dark')
+        color: #ffffff;
+        @else
         color: #2d3748;
+        @endif
+        position: relative;
+    }
+    
+    .results-header h2::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background: var(--gradient);
+        border-radius: 2px;
+    }
+    
+    .btn-primary {
+        background: var(--gradient);
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .btn-primary:hover::before {
+        left: 100%;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .hero-stats {
+        background: rgba(255,255,255,0.1);
+        border-radius: 20px;
+        padding: 2rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .stat-item h3 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
     }
     
     @media (max-width: 768px) {
         .hero-section {
             padding: 3rem 0 !important;
+            min-height: 50vh;
         }
         
         .search-form .row > div {
             margin-bottom: 1rem;
+        }
+        
+        .search-form .form-control,
+        .search-form .btn {
+            font-size: 1rem;
+            padding: 0.875rem 1.25rem;
         }
         
         .filters-sidebar {
@@ -401,6 +732,99 @@
         .job-card .col-auto {
             margin-bottom: 1rem;
         }
+        
+        .company-logo {
+            width: 60px;
+            height: 60px;
+        }
+        
+        .hero-stats {
+            margin-top: 2rem;
+            padding: 1.5rem;
+        }
+        
+        .stat-item h3 {
+            font-size: 2.5rem;
+        }
+    }
+    
+    /* Pagination Styles */
+    .pagination-wrapper {
+        background: {{ $theme === 'dark' ? '#2d3748' : 'rgba(255,255,255,0.95)' }};
+        border-radius: 15px;
+        padding: 1rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        border: {{ $theme === 'dark' ? '1px solid #4a5568' : '1px solid rgba(255,255,255,0.2)' }};
+    }
+    
+    .pagination .page-link {
+        @if($theme === 'dark')
+        background-color: #4a5568;
+        border: 1px solid #718096;
+        color: #e2e8f0;
+        @else
+        background-color: #ffffff;
+        border: 1px solid #e9ecef;
+        color: #6c757d;
+        @endif
+        padding: 0.75rem 1rem;
+        margin: 0 2px;
+        border-radius: 10px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .pagination .page-link:hover {
+        @if($theme === 'dark')
+        background-color: #718096;
+        border-color: var(--primary-color);
+        color: #ffffff;
+        @else
+        background-color: #f8f9fa;
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        @endif
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .pagination .page-item.active .page-link {
+        background: var(--gradient);
+        border-color: transparent;
+        color: #ffffff;
+        font-weight: 600;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .pagination .page-item.disabled .page-link {
+        @if($theme === 'dark')
+        background-color: #2d3748;
+        border-color: #4a5568;
+        color: #718096;
+        @else
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        color: #adb5bd;
+        @endif
+        opacity: 0.6;
+    }
+    
+    .pagination .page-link::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .pagination .page-link:hover::before {
+        left: 100%;
     }
 </style>
 @endpush

@@ -12,22 +12,80 @@ class JobController extends Controller
      */
     public function index(Request $request)
     {
-        $jobs = Job::with(['company.user', 'location', 'industry'])
-                   ->where('status', 'published')
-                   ->when($request->search, function($query, $search) {
-                       $query->where('title', 'like', "%{$search}%")
-                             ->orWhere('description', 'like', "%{$search}%");
-                   })
-                   ->when($request->location, function($query, $location) {
-                       $query->whereHas('location', function($q) use ($location) {
-                           $q->where('city', 'like', "%{$location}%")
-                             ->orWhere('state', 'like', "%{$location}%");
-                       });
-                   })
-                   ->latest()
-                   ->paginate(20);
+        $query = Job::with(['company', 'jobType', 'skills'])
+            ->where('status', 'active')
+            ->where('visibility', '!=', 'private'); // Exclude private jobs from public listing
 
-        return view('jobs.index', compact('jobs'));
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhereHas('company', function($companyQuery) use ($search) {
+                      $companyQuery->where('company_name', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('skills', function($skillQuery) use ($search) {
+                      $skillQuery->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Location filter
+        if ($request->filled('location')) {
+            $query->where('location', 'like', "%{$request->location}%");
+        }
+
+        // Remote work filter
+        if ($request->filled('employment_type') && in_array('remote', $request->employment_type)) {
+            $query->where('is_remote', true);
+        }
+
+        // Experience range filter (using experience_min and experience_max)
+        if ($request->filled('experience_level')) {
+            switch ($request->experience_level) {
+                case 'entry':
+                    $query->where('experience_min', '<=', 2);
+                    break;
+                case 'mid':
+                    $query->whereBetween('experience_min', [2, 5]);
+                    break;
+                case 'senior':
+                    $query->where('experience_min', '>=', 5);
+                    break;
+            }
+        }
+
+        // Salary range filter
+        if ($request->filled('salary_min')) {
+            $query->where('salary_max', '>=', $request->salary_min);
+        }
+        if ($request->filled('salary_max')) {
+            $query->where('salary_min', '<=', $request->salary_max);
+        }
+
+        // Sorting
+        switch ($request->get('sort', 'newest')) {
+            case 'salary_high':
+                $query->orderByDesc('salary_max');
+                break;
+            case 'salary_low':
+                $query->orderBy('salary_min');
+                break;
+            case 'company':
+                $query->join('companies', 'jobs.company_id', '=', 'companies.id')
+                      ->orderBy('companies.company_name');
+                break;
+            default:
+                $query->latest();
+        }
+
+        $jobs = $query->paginate(20);
+        
+        // Get total jobs count for the hero section
+        $totalJobs = Job::where('status', 'active')->count();
+
+        return view('jobs.index', compact('jobs', 'totalJobs'));
     }
 
     /**
