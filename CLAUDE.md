@@ -3,6 +3,12 @@
 ## Project Overview
 Job Portal is a Laravel/Vue.js-based Multi-Role Job Portal Platform with separate Admin, Company, and Candidate dashboards. This project follows strict development guidelines with a comprehensive feature set for job and project management.
 
+### 🌐 Key Architectural Features
+- **Multi-Workspace System**: Each user can create and manage multiple workspaces
+- **Internationalization (i18n)**: Full multi-language support throughout the application
+- **Role-Based Access**: Admin, Company, and Candidate roles with workspace-level permissions
+- **Default Workspace**: Automatically created upon user registration with their details
+
 ## 📚 REQUIREMENTS DOCUMENTATION
 **IMPORTANT**: All detailed requirements, specifications, and features are documented in the `/Docs` folder:
 - `/Docs/Requirements/functional_requirements.md` - Complete functional specifications with 180+ requirements
@@ -18,9 +24,9 @@ Job Portal is a Laravel/Vue.js-based Multi-Role Job Portal Platform with separat
 1. **ALWAYS follow Laravel best practices** - NO EXCEPTIONS
 2. **Use Vue.js 3 with Composition API** for all frontend components
 3. **FOLLOW RESTful API conventions** for all endpoints
-4. **Use Laravel Sanctum** for authentication
+4. **Use Laravel Sanctum** for authentication with workspace context
 5. **IMPLEMENT proper validation** on both frontend and backend
-6. **MAINTAIN role-based access control** (RBAC) for all features
+6. **MAINTAIN role-based access control** (RBAC) with workspace-level permissions
 7. **Use database migrations** for all schema changes
 8. **Keep API responses consistent** - Use resource classes
 9. **IMPLEMENT proper error handling** with meaningful messages
@@ -33,6 +39,8 @@ Job Portal is a Laravel/Vue.js-based Multi-Role Job Portal Platform with separat
 13. **Performance** - Optimize queries with indexing and eager loading
 14. **Testing** - Write tests for all critical functionality
 15. **REFER TO DOCS** - Always check `/Docs/Requirements/` for specifications
+16. **i18n MANDATORY** - All text must use translation keys, never hardcode strings
+17. **Multi-Workspace** - All data must be scoped to workspace context
 
 ## Core Development Principles
 
@@ -76,7 +84,123 @@ Job Portal is a Laravel/Vue.js-based Multi-Role Job Portal Platform with separat
 - **Status Report**: Provide completion status and testing steps
 - **Requirements Tracking**: Note which requirements were implemented
 
-### 3. Code Quality Standards
+### 3. Internationalization (i18n) Standards
+
+#### Core i18n Requirements
+- **Language Support**: Support for multiple languages (initially English, French, Spanish, German)
+- **Locale Management**: Each workspace can have its own default locale
+- **User Preferences**: Users can override workspace locale with personal preference
+- **RTL Support**: Ready for right-to-left languages (Arabic, Hebrew)
+- **Translation Keys**: Use hierarchical dot notation (e.g., 'auth.login.title')
+- **Fallback Language**: English as default fallback language
+
+#### Localization Standards
+- **Currency Formatting**:
+  - Support multiple currencies (USD, EUR, GBP, CAD)
+  - Currency stored per workspace settings
+  - Use ISO 4217 currency codes
+  - Format using Laravel's number formatter
+  - Display format: symbol + amount or amount + code based on locale
+  
+- **Date/Time Formatting**:
+  - Store all dates in UTC in database
+  - Convert to workspace/user timezone for display
+  - Support formats: MM/DD/YYYY (US), DD/MM/YYYY (EU), YYYY-MM-DD (ISO)
+  - Time formats: 12-hour with AM/PM (US), 24-hour (EU)
+  - Use Carbon for all date operations
+  - Relative time display for recent activities
+
+- **Number Formatting**:
+  - Decimal separator: period (.) for US/UK, comma (,) for EU
+  - Thousand separator: comma (,) for US/UK, period (.) for EU
+  - Phone number formats per country
+
+#### Implementation Guidelines
+
+##### Backend (Laravel)
+```php
+// Always use translation helpers
+__('messages.welcome', ['name' => $user->name])
+
+// Currency formatting
+Money::format($amount, $workspace->currency)
+
+// Date formatting
+$date->locale($user->locale)->isoFormat('L LT')
+```
+
+##### Frontend (Vue.js)
+```javascript
+// Use Vue i18n
+$t('messages.welcome', { name: userName })
+
+// Currency formatting
+$n(amount, 'currency', locale)
+
+// Date formatting
+$d(date, 'long', locale)
+```
+
+#### Translation File Structure
+```
+resources/
+├── lang/
+│   ├── en/
+│   │   ├── auth.php
+│   │   ├── validation.php
+│   │   ├── jobs.php
+│   │   ├── companies.php
+│   │   └── candidates.php
+│   ├── fr/
+│   ├── es/
+│   └── de/
+```
+
+### 4. Multi-Workspace Architecture
+
+#### Workspace Concepts
+- **Workspace**: Isolated environment for each organization/individual
+- **Default Workspace**: Auto-created on user registration
+- **Workspace Switching**: Users can switch between workspaces seamlessly
+- **Data Isolation**: Complete data separation between workspaces
+- **Shared Users**: Users can belong to multiple workspaces with different roles
+
+#### Database Design for Workspaces
+```sql
+-- Core workspace tables
+workspaces (id, name, slug, owner_id, settings, created_at)
+workspace_users (workspace_id, user_id, role, joined_at)
+workspace_invitations (workspace_id, email, role, token, expires_at)
+
+-- All feature tables include workspace_id
+jobs (id, workspace_id, company_id, ...)
+companies (id, workspace_id, ...)
+candidates (id, workspace_id, user_id, ...)
+```
+
+#### Workspace Features
+- **Workspace Settings**:
+  - Default language/locale
+  - Currency preference
+  - Timezone setting
+  - Date/time format
+  - Subscription plan (per workspace)
+  
+- **Workspace Management**:
+  - Create new workspace
+  - Invite users to workspace
+  - Transfer workspace ownership
+  - Archive/delete workspace
+  - Workspace activity logs
+
+#### Implementation Requirements
+- **Middleware**: Workspace detection and validation
+- **Query Scoping**: Automatic workspace filtering using global scopes
+- **API Routes**: All routes prefixed with workspace identifier
+- **Session Management**: Store current workspace in session
+- **Permissions**: Check workspace-level permissions
+
+### 5. Code Quality Standards
 
 #### Laravel/PHP Standards
 - Follow PSR-12 coding standard
@@ -105,12 +229,14 @@ Job Portal is a Laravel/Vue.js-based Multi-Role Job Portal Platform with separat
 - **Follow Schema**: STRICTLY follow `/Docs/Requirements/database_schema.md`
 
 #### API Standards
-- **RESTful Routes**: Follow REST conventions
-- **Versioning**: Use API versioning (v1, v2)
-- **Response Format**: Consistent JSON structure
+- **RESTful Routes**: Follow REST conventions with workspace prefix
+- **Versioning**: Use API versioning (/api/v1/workspaces/{workspace}/...)
+- **Response Format**: Consistent JSON structure with locale-aware formatting
 - **Status Codes**: Use appropriate HTTP status codes
-- **Authentication**: Protect routes with Sanctum middleware
-- **Rate Limiting**: Implement rate limiting as per technical_requirements.md
+- **Authentication**: Protect routes with Sanctum middleware + workspace validation
+- **Rate Limiting**: Implement rate limiting per workspace
+- **Localization**: Return translated messages based on user locale
+- **Currency/Date**: Format based on workspace/user preferences in responses
 
 ### 4. User Role Implementation
 
@@ -233,35 +359,68 @@ Job-Portal/
 ├── app/
 │   ├── Http/
 │   │   ├── Controllers/
+│   │   │   ├── Workspace/
+│   │   │   │   ├── WorkspaceController.php
+│   │   │   │   └── WorkspaceInvitationController.php
 │   │   │   ├── Admin/
 │   │   │   ├── Company/
 │   │   │   └── Candidate/
+│   │   ├── Middleware/
+│   │   │   ├── WorkspaceMiddleware.php
+│   │   │   └── LocaleMiddleware.php
 │   │   ├── Requests/
 │   │   └── Resources/
 │   ├── Models/
+│   │   ├── Workspace.php
+│   │   └── WorkspaceUser.php
 │   ├── Services/
-│   └── Repositories/
+│   │   ├── WorkspaceService.php
+│   │   ├── LocalizationService.php
+│   │   └── CurrencyService.php
+│   ├── Repositories/
+│   └── Traits/
+│       └── BelongsToWorkspace.php
 ├── database/
 │   ├── migrations/
+│   │   ├── xxxx_create_workspaces_table.php
+│   │   └── xxxx_add_workspace_to_tables.php
 │   ├── seeders/
 │   └── factories/
 ├── resources/
 │   ├── js/
 │   │   ├── components/
+│   │   │   └── workspace/
 │   │   ├── pages/
+│   │   │   ├── workspace/
 │   │   │   ├── admin/
 │   │   │   ├── company/
 │   │   │   └── candidate/
 │   │   ├── stores/
+│   │   │   ├── workspace.js
+│   │   │   └── locale.js
+│   │   ├── composables/
+│   │   │   ├── useWorkspace.js
+│   │   │   └── useLocale.js
+│   │   ├── i18n/
+│   │   │   └── index.js
 │   │   └── utils/
+│   │       ├── currency.js
+│   │       └── datetime.js
+│   ├── lang/
+│   │   ├── en/
+│   │   ├── fr/
+│   │   ├── es/
+│   │   └── de/
 │   └── views/
 ├── routes/
 │   ├── api.php
 │   ├── web.php
+│   ├── workspace.php
 │   └── admin.php
 ├── tests/
 │   ├── Unit/
 │   ├── Feature/
+│   │   └── Workspace/
 │   └── Browser/
 ├── Docs/
 │   ├── Requirements/
@@ -419,21 +578,26 @@ php artisan dusk
 ## Important Reminders
 
 - **ALWAYS** refer to `/Docs/Requirements/` for detailed specifications
+- **i18n FIRST** - Never hardcode strings, always use translation keys
+- **Workspace Context** - All operations must be workspace-scoped
+- **Localization** - Format dates, currencies, numbers per user/workspace locale
 - Use TodoWrite tool for task tracking
 - Cross-reference with database_schema.md before creating migrations
 - Validate against user_stories.md during implementation
 - Follow the 3-tier architecture (Admin, Company, Candidate)
 - Implement proper validation and error handling
-- Write tests for all new features
+- Write tests for all new features including i18n and workspace isolation
 - Optimize for mobile devices
 - Focus on security and performance
-- Document all API endpoints
+- Document all API endpoints with locale examples
 - Use Laravel conventions and best practices
-- Test subscription limits and payment flows
+- Test subscription limits and payment flows per workspace
 - Track which requirements are being implemented
+- Default workspace creation on user registration
+- Support North American (US, Canada) and European locale standards
 
 ---
 Last Updated: 2025-08-15
-Version: 2.0
-Project: Multi-Role Job Portal Platform
+Version: 3.0
+Project: Multi-Role Job Portal Platform with Multi-Workspace & i18n Support
 Documentation: Complete requirements in `/Docs/Requirements/`
