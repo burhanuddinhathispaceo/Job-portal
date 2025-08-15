@@ -172,7 +172,7 @@
                         </a>
                     </li>
                     
-                    @if(auth()->guard('admin')->user()->hasPermission('users.manage'))
+                    {{-- User Management --}}
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" 
                            href="{{ route('admin.users.index') }}">
@@ -196,9 +196,8 @@
                             <span class="sidebar-text">Candidates</span>
                         </a>
                     </li>
-                    @endif
                     
-                    @if(auth()->guard('admin')->user()->hasPermission('content.moderate'))
+                    {{-- Content Management --}}
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.jobs.*') ? 'active' : '' }}" 
                            href="{{ route('admin.jobs.index') }}">
@@ -214,9 +213,8 @@
                             <span class="sidebar-text">Projects</span>
                         </a>
                     </li>
-                    @endif
                     
-                    @if(auth()->guard('admin')->user()->hasPermission('subscriptions.manage'))
+                    {{-- Subscription Management --}}
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.subscriptions.*') ? 'active' : '' }}" 
                            href="{{ route('admin.subscriptions.index') }}">
@@ -232,9 +230,8 @@
                             <span class="sidebar-text">Plans</span>
                         </a>
                     </li>
-                    @endif
                     
-                    @if(auth()->guard('admin')->user()->hasPermission('analytics.view'))
+                    {{-- Analytics & Reports --}}
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.analytics.*') ? 'active' : '' }}" 
                            href="{{ route('admin.analytics.index') }}">
@@ -250,9 +247,8 @@
                             <span class="sidebar-text">Reports</span>
                         </a>
                     </li>
-                    @endif
                     
-                    @if(auth()->guard('admin')->user()->hasPermission('system.configure'))
+                    {{-- System Configuration --}}
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}" 
                            href="{{ route('admin.settings.index') }}">
@@ -268,7 +264,6 @@
                             <span class="sidebar-text">Website</span>
                         </a>
                     </li>
-                    @endif
                 </ul>
             </div>
         </nav>
