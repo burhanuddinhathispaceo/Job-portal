@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             ProjectTypeSeeder::class,
             SkillSeeder::class,
             SubscriptionPlanSeeder::class,
+            AdminSeeder::class,
         ]);
     }
 }
