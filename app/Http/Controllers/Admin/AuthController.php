@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Admin;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -35,14 +35,17 @@ class AuthController extends Controller
 
         $credentials = $request->only('email', 'password');
         
-        // Check if admin exists and is active
-        $admin = Admin::where('email', $request->email)->first();
+        // Check if admin user exists and is active
+        $admin = User::where('email', $request->email)->where('role', 'admin')->first();
         
         if (!$admin || !$admin->isActive()) {
             return back()->withErrors([
                 'email' => 'Invalid credentials or account is inactive.',
             ])->onlyInput('email');
         }
+
+        // Add role check to credentials
+        $credentials['role'] = 'admin';
 
         if (Auth::guard('admin')->attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
@@ -95,9 +98,9 @@ class AuthController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:admins',
+            'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'mobile' => 'nullable|string|max:20|unique:admins',
+            'mobile' => 'nullable|string|max:20',
         ]);
 
         if ($validator->fails()) {
@@ -105,13 +108,13 @@ class AuthController extends Controller
         }
 
         try {
-            $admin = Admin::create([
+            $admin = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'password' => $request->password,
-                'mobile' => $request->mobile,
+                'password' => Hash::make($request->password),
+                'phone' => $request->mobile,
+                'role' => 'admin',
                 'status' => 'active',
-                'permissions' => ['users.view', 'content.moderate'], // Basic permissions
                 'email_verified_at' => now(),
             ]);
 

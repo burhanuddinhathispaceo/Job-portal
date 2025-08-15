@@ -549,19 +549,27 @@
                         <div class="d-flex align-items-center">
                             <div class="rounded-circle d-flex align-items-center justify-content-center me-3" 
                                  style="width: 35px; height: 35px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                                <span class="text-white fw-bold small">{{ substr($application->candidate->user->name, 0, 1) }}</span>
+                                <span class="text-white fw-bold small">{{ substr($application->candidate->user->name ?? 'U', 0, 1) }}</span>
                             </div>
                             <div class="flex-grow-1">
-                                <div class="fw-semibold text-dark small">{{ $application->candidate->user->name }}</div>
+                                <div class="fw-semibold text-dark small">{{ $application->candidate->user->name ?? 'Unknown' }}</div>
                                 <div class="d-flex align-items-center mt-1">
                                     <span class="badge bg-light text-dark me-2" style="font-size: 0.6rem;">
-                                        <i class="fas fa-briefcase me-1"></i>
-                                        {{ Str::limit($application->job->title, 15) }}
+                                        @if($application->job)
+                                            <i class="fas fa-briefcase me-1"></i>
+                                            {{ Str::limit($application->job->title, 15) }}
+                                        @elseif($application->project)
+                                            <i class="fas fa-project-diagram me-1"></i>
+                                            {{ Str::limit($application->project->title, 15) }}
+                                        @else
+                                            <i class="fas fa-question me-1"></i>
+                                            N/A
+                                        @endif
                                     </span>
                                     <small class="text-muted" style="font-size: 0.7rem;">{{ $application->created_at->diffForHumans() }}</small>
                                 </div>
                             </div>
-                            <span class="badge bg-{{ $application->status === 'pending' ? 'warning' : ($application->status === 'approved' ? 'success' : 'danger') }} rounded-pill" style="font-size: 0.6rem;">
+                            <span class="badge bg-{{ $application->status === 'applied' ? 'warning' : ($application->status === 'selected' ? 'success' : 'secondary') }} rounded-pill" style="font-size: 0.6rem;">
                                 {{ ucfirst($application->status) }}
                             </span>
                         </div>
