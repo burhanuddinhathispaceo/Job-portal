@@ -293,12 +293,7 @@
     }
     
     body {
-        @if($theme === 'dark')
-        background-color: #1a1a1a;
-        color: #ffffff;
-        @else
-        background-color: #f8f9fa;
-        @endif
+        {{ $theme === 'dark' ? 'background-color: #1a1a1a; color: #ffffff;' : 'background-color: #f8f9fa;' }}
     }
     
     .hero-section {
@@ -391,83 +386,55 @@
         background: var(--gradient) !important;
     }
     
+    /* Dark theme specific styles */
     @if($theme === 'dark')
-    .card {
-        background-color: #2d3748;
-        border: 1px solid #4a5568;
-        color: #ffffff;
-    }
-    
-    .card-header {
-        background-color: #4a5568 !important;
-        border-bottom: 1px solid #718096;
-        color: #ffffff;
-    }
-    
-    .form-control, .form-select {
-        background-color: #4a5568;
-        border: 1px solid #718096;
-        color: #ffffff;
-    }
-    
-    .form-control:focus, .form-select:focus {
-        background-color: #4a5568;
-        border-color: var(--primary-color);
-        color: #ffffff;
-        box-shadow: 0 0 0 0.2rem {{ $primaryColor }}25;
-    }
-    
-    .text-muted {
-        color: #a0aec0 !important;
-    }
-    
-    .text-dark {
-        color: #ffffff !important;
-    }
-    
-    .job-card {
-        background-color: #2d3748;
-        border: 1px solid #4a5568;
-    }
-    
-    .job-card:hover {
-        background-color: #4a5568;
-        border-color: var(--primary-color);
-    }
-    
-    .job-tag {
-        background: #4a5568;
-        color: #e2e8f0;
-    }
-    
-    .job-tag.remote {
-        background: #065f46;
-        color: #6ee7b7;
-    }
-    
-    .job-tag.featured {
-        background: #7c2d12;
-        color: #fed7aa;
-    }
-    
-    .job-tag.highlighted {
-        background: #7c2d12;
-        color: #fbbf24;
-    }
-    
-    .filters-sidebar .card {
-        background-color: #2d3748;
-        border: 1px solid #4a5568;
-    }
-    
-    .admin-header {
-        background-color: #2d3748 !important;
-        border-bottom: 1px solid #4a5568;
-    }
-    
-    .results-header h2 {
-        color: #ffffff;
-    }
+        .card {
+            background-color: #2d3748;
+            border: 1px solid #4a5568;
+            color: #ffffff;
+        }
+        
+        .card-header {
+            background-color: #4a5568 !important;
+            border-bottom: 1px solid #718096;
+            color: #ffffff;
+        }
+        
+        .form-control, .form-select {
+            background-color: #4a5568;
+            border: 1px solid #718096;
+            color: #ffffff;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background-color: #4a5568;
+            border-color: var(--primary-color);
+            color: #ffffff;
+            box-shadow: 0 0 0 0.2rem {{ $primaryColor }}25;
+        }
+        
+        .text-muted {
+            color: #a0aec0 !important;
+        }
+        
+        .text-dark {
+            color: #ffffff !important;
+        }
+        
+        .job-card {
+            background-color: #2d3748;
+            border: 1px solid #4a5568;
+        }
+        
+        .job-card:hover {
+            background-color: #4a5568;
+            border-color: var(--primary-color);
+        }
+        
+        .admin-header {
+            background-color: #2d3748 !important;
+            border-bottom: 1px solid #4a5568;
+        }
     @endif
     
     .job-card {
@@ -491,11 +458,7 @@
     
     .job-card:hover {
         transform: translateY(-8px);
-        @if($theme === 'dark')
-        box-shadow: 0 20px 40px rgba(0,0,0,0.3) !important;
-        @else
-        box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
-        @endif
+        {{ $theme === 'dark' ? 'box-shadow: 0 20px 40px rgba(0,0,0,0.3) !important;' : 'box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;' }}
     }
     
     .job-card:hover::before {
@@ -552,13 +515,7 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        @if($theme === 'dark')
-        background: #4a5568;
-        color: #e2e8f0;
-        @else
-        background: #f8f9fa;
-        color: #6c757d;
-        @endif
+        {{ $theme === 'dark' ? 'background: #4a5568; color: #e2e8f0;' : 'background: #f8f9fa; color: #6c757d;' }}
         padding: 6px 14px;
         border-radius: 25px;
         font-size: 0.875rem;
@@ -575,33 +532,15 @@
     }
     
     .job-tag.remote {
-        @if($theme === 'dark')
-        background: #065f46;
-        color: #6ee7b7;
-        @else
-        background: #e6fffa;
-        color: #047481;
-        @endif
+        {{ $theme === 'dark' ? 'background: #065f46; color: #6ee7b7;' : 'background: #e6fffa; color: #047481;' }}
     }
     
     .job-tag.featured {
-        @if($theme === 'dark')
-        background: #7c2d12;
-        color: #fed7aa;
-        @else
-        background: #fef3c7;
-        color: #d97706;
-        @endif
+        {{ $theme === 'dark' ? 'background: #7c2d12; color: #fed7aa;' : 'background: #fef3c7; color: #d97706;' }}
     }
     
     .job-tag.highlighted {
-        @if($theme === 'dark')
-        background: #7c2d12;
-        color: #fbbf24;
-        @else
-        background: #fef3c7;
-        color: #d97706;
-        @endif
+        {{ $theme === 'dark' ? 'background: #7c2d12; color: #fbbf24;' : 'background: #fef3c7; color: #d97706;' }}
     }
     
     .filter-section {
@@ -617,10 +556,7 @@
     .filters-sidebar .card {
         border-radius: 20px;
         border: none;
-        @if($theme === 'light')
-        background: rgba(255,255,255,0.95);
-        backdrop-filter: blur(10px);
-        @endif
+        {{ $theme === 'light' ? 'background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);' : 'background: #2d3748; border: 1px solid #4a5568;' }}
         box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
     
@@ -641,11 +577,7 @@
     }
     
     .results-header h2 {
-        @if($theme === 'dark')
-        color: #ffffff;
-        @else
-        color: #2d3748;
-        @endif
+        {{ $theme === 'dark' ? 'color: #ffffff;' : 'color: #2d3748;' }}
         position: relative;
     }
     
@@ -759,15 +691,7 @@
     }
     
     .pagination .page-link {
-        @if($theme === 'dark')
-        background-color: #4a5568;
-        border: 1px solid #718096;
-        color: #e2e8f0;
-        @else
-        background-color: #ffffff;
-        border: 1px solid #e9ecef;
-        color: #6c757d;
-        @endif
+        {{ $theme === 'dark' ? 'background-color: #4a5568; border: 1px solid #718096; color: #e2e8f0;' : 'background-color: #ffffff; border: 1px solid #e9ecef; color: #6c757d;' }}
         padding: 0.75rem 1rem;
         margin: 0 2px;
         border-radius: 10px;
@@ -778,15 +702,7 @@
     }
     
     .pagination .page-link:hover {
-        @if($theme === 'dark')
-        background-color: #718096;
-        border-color: var(--primary-color);
-        color: #ffffff;
-        @else
-        background-color: #f8f9fa;
-        border-color: var(--primary-color);
-        color: var(--primary-color);
-        @endif
+        {{ $theme === 'dark' ? 'background-color: #718096; border-color: var(--primary-color); color: #ffffff;' : 'background-color: #f8f9fa; border-color: var(--primary-color); color: var(--primary-color);' }}
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
@@ -800,15 +716,7 @@
     }
     
     .pagination .page-item.disabled .page-link {
-        @if($theme === 'dark')
-        background-color: #2d3748;
-        border-color: #4a5568;
-        color: #718096;
-        @else
-        background-color: #f8f9fa;
-        border-color: #dee2e6;
-        color: #adb5bd;
-        @endif
+        {{ $theme === 'dark' ? 'background-color: #2d3748; border-color: #4a5568; color: #718096;' : 'background-color: #f8f9fa; border-color: #dee2e6; color: #adb5bd;' }}
         opacity: 0.6;
     }
     
