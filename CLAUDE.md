@@ -3,6 +3,17 @@
 ## Project Overview
 Job Portal is a Laravel/Vue.js-based Multi-Role Job Portal Platform with separate Admin, Company, and Candidate dashboards. This project follows strict development guidelines with a comprehensive feature set for job and project management.
 
+## 📚 REQUIREMENTS DOCUMENTATION
+**IMPORTANT**: All detailed requirements, specifications, and features are documented in the `/Docs` folder:
+- `/Docs/Requirements/functional_requirements.md` - Complete functional specifications with 180+ requirements
+- `/Docs/Requirements/technical_requirements.md` - Technical architecture, stack, and standards
+- `/Docs/Requirements/database_schema.md` - Full database design with 20+ tables and relationships
+- `/Docs/Requirements/user_stories.md` - 170+ detailed user stories for all roles
+- `/Docs/Requirements/additional_features.md` - Advanced features and future enhancements
+- `/Requirments/documentation.md` - Original project scope document
+
+**ALWAYS REFER TO THESE DOCUMENTS** for detailed implementation requirements before starting any task.
+
 ## 🚨 CRITICAL DEVELOPMENT RULES
 1. **ALWAYS follow Laravel best practices** - NO EXCEPTIONS
 2. **Use Vue.js 3 with Composition API** for all frontend components
@@ -21,6 +32,7 @@ Job Portal is a Laravel/Vue.js-based Multi-Role Job Portal Platform with separat
 12. **Mobile Responsive** - All interfaces must work on mobile devices
 13. **Performance** - Optimize queries with indexing and eager loading
 14. **Testing** - Write tests for all critical functionality
+15. **REFER TO DOCS** - Always check `/Docs/Requirements/` for specifications
 
 ## Core Development Principles
 
@@ -30,14 +42,16 @@ Job Portal is a Laravel/Vue.js-based Multi-Role Job Portal Platform with separat
 - **Subtask Definition**: Each task must have clearly defined subtasks
 - **Documentation**: Store all task documentation in `/docs/tasks/` folder
 - **Task Tracking**: Use TodoWrite tool to track progress on all tasks
+- **Requirements Reference**: Link tasks to specific requirements from `/Docs/Requirements/`
 
 ### 2. Development Workflow (Mandatory for Each Task)
 
 #### Phase 1: Analysis & Planning
-- **Requirements Analysis**: Thoroughly analyze task requirements from documentation.md
+- **Requirements Analysis**: Review relevant sections in `/Docs/Requirements/` folder
 - **Implementation Plan**: Create detailed implementation strategy
 - **Impact Assessment**: Document which files/modules will be affected
 - **Dependencies**: Identify all Laravel packages and Vue libraries needed
+- **Database Review**: Check `/Docs/Requirements/database_schema.md` for table structures
 
 #### Phase 2: Implementation
 - **Modular Code**: Write clean, modular, reusable code
@@ -45,6 +59,7 @@ Job Portal is a Laravel/Vue.js-based Multi-Role Job Portal Platform with separat
 - **Type Hints**: Include type hints for all PHP methods
 - **Error Handling**: Implement try-catch blocks and proper validation
 - **Logging**: Use Laravel's logging system for debugging
+- **Follow Schema**: Implement exactly as defined in database_schema.md
 
 #### Phase 3: Testing & Validation
 - **Unit Tests**: Write PHPUnit tests for all new features
@@ -52,12 +67,14 @@ Job Portal is a Laravel/Vue.js-based Multi-Role Job Portal Platform with separat
 - **Frontend Tests**: Test Vue components with Vitest
 - **Test Coverage**: Maintain minimum 80% code coverage
 - **Bug Fixes**: Run all tests and fix issues before proceeding
+- **User Story Validation**: Ensure implementation satisfies user stories
 
 #### Phase 4: Documentation & Commit
 - **Code Documentation**: Add PHPDoc comments to all methods
 - **API Documentation**: Update API documentation for new endpoints
 - **Git Commit**: Create detailed commit with task reference
 - **Status Report**: Provide completion status and testing steps
+- **Requirements Tracking**: Note which requirements were implemented
 
 ### 3. Code Quality Standards
 
@@ -68,6 +85,7 @@ Job Portal is a Laravel/Vue.js-based Multi-Role Job Portal Platform with separat
 - Use Form Requests for validation
 - Implement API Resources for response formatting
 - Use Eloquent ORM effectively with relationships
+- Follow database schema exactly as defined in `/Docs/Requirements/database_schema.md`
 
 #### Vue.js Standards
 - Use Composition API for all components
@@ -76,13 +94,15 @@ Job Portal is a Laravel/Vue.js-based Multi-Role Job Portal Platform with separat
 - Follow component naming conventions (PascalCase)
 - Implement proper prop validation
 - Use async/await for API calls
+- Implement UI components as per `/Docs/UIUX/` specifications (if available)
 
 #### Database Standards
 - **Naming Conventions**: Use snake_case for tables and columns
 - **Migrations**: One migration per feature/table change
-- **Indexes**: Add indexes for frequently queried columns
-- **Relationships**: Define all relationships in models
+- **Indexes**: Add indexes as specified in database_schema.md
+- **Relationships**: Define all relationships as documented
 - **Seeders**: Create seeders for test data
+- **Follow Schema**: STRICTLY follow `/Docs/Requirements/database_schema.md`
 
 #### API Standards
 - **RESTful Routes**: Follow REST conventions
@@ -90,30 +110,35 @@ Job Portal is a Laravel/Vue.js-based Multi-Role Job Portal Platform with separat
 - **Response Format**: Consistent JSON structure
 - **Status Codes**: Use appropriate HTTP status codes
 - **Authentication**: Protect routes with Sanctum middleware
-- **Rate Limiting**: Implement rate limiting for API endpoints
+- **Rate Limiting**: Implement rate limiting as per technical_requirements.md
 
 ### 4. User Role Implementation
 
-#### Admin Features
+**Refer to `/Docs/Requirements/functional_requirements.md` for complete feature list**
+
+#### Admin Features (REQ-ADM-*)
 - Full system control and user management
 - System constants management (job types, skills, industries)
 - Website customization (themes, branding)
 - Subscription plan management
 - Analytics and reporting
+- Content moderation and quality control
 
-#### Company Features
+#### Company Features (REQ-CMP-*)
 - Job and project posting (normal, highlighted, featured)
 - Candidate search based on subscription
 - Application management and status tracking
 - Bookmark system for candidates
 - Company profile management
+- Analytics dashboard
 
-#### Candidate Features
+#### Candidate Features (REQ-CND-*)
 - Advanced job/project search with filters
 - One-click application with profile
 - Application tracking with status updates
 - Profile management (resume, skills, experience)
 - Bookmark system for jobs/projects
+- Personalized recommendations
 
 ### 5. Testing Requirements
 
@@ -122,6 +147,7 @@ Job Portal is a Laravel/Vue.js-based Multi-Role Job Portal Platform with separat
 - **Feature Tests**: Test complete features and workflows
 - **API Tests**: Test all API endpoints with different scenarios
 - **Browser Tests**: Test UI interactions with Laravel Dusk
+- **User Story Tests**: Validate against user stories in `/Docs/Requirements/user_stories.md`
 
 #### Test Standards
 - Test file naming: `*Test.php`
@@ -129,6 +155,7 @@ Job Portal is a Laravel/Vue.js-based Multi-Role Job Portal Platform with separat
 - Mock external services and APIs
 - Test both success and failure cases
 - Include validation testing
+- Test coverage minimum: 80%
 
 ### 6. Documentation Standards
 
@@ -136,6 +163,7 @@ Job Portal is a Laravel/Vue.js-based Multi-Role Job Portal Platform with separat
 ```php
 /**
  * Process job application
+ * Implements: REQ-CND-013 (One-click apply)
  * 
  * @param Request $request
  * @param Job $job
@@ -148,6 +176,7 @@ public function apply(Request $request, Job $job): JsonResponse
 #### API Documentation Template
 ```markdown
 ### Endpoint: POST /api/jobs/{id}/apply
+**Requirement**: REQ-CND-013
 
 **Description**: Submit application for a job
 
@@ -183,18 +212,19 @@ public function apply(Request $request, Job $job): JsonResponse
 - Bugfix branches: `bugfix/task-XXX-description`
 
 #### Commit Guidelines
-- Commit message format: `[Task-XXX] Feature: Brief description`
+- Commit message format: `[Task-XXX] Feature: Brief description (Implements REQ-XXX-XXX)`
 - Include detailed description in commit body
-- Reference related issues or tasks
+- Reference related requirements from `/Docs/Requirements/`
 - Ensure all tests pass before committing
 
 #### Pre-commit Checklist
 - [ ] All tests passing
 - [ ] Code follows Laravel/Vue standards
-- [ ] Database migrations tested
+- [ ] Database migrations match schema documentation
 - [ ] API documentation updated
 - [ ] No sensitive data in code
 - [ ] Performance impact assessed
+- [ ] Requirements satisfied
 
 ### 8. Project Structure
 
@@ -233,6 +263,14 @@ Job-Portal/
 │   ├── Unit/
 │   ├── Feature/
 │   └── Browser/
+├── Docs/
+│   ├── Requirements/
+│   │   ├── functional_requirements.md
+│   │   ├── technical_requirements.md
+│   │   ├── database_schema.md
+│   │   ├── user_stories.md
+│   │   └── additional_features.md
+│   └── UIUX/
 └── docs/
     ├── tasks/
     └── api/
@@ -240,11 +278,14 @@ Job-Portal/
 
 ### 9. Security Guidelines
 
-#### Authentication & Authorization
+**Refer to `/Docs/Requirements/technical_requirements.md` Section 2 for complete security requirements**
+
+#### Authentication & Authorization (TECH-SEC-*)
 - Implement Laravel Sanctum for API authentication
 - Use middleware for route protection
 - Implement role-based permissions
 - Validate user permissions for each action
+- Session timeout after inactivity
 
 #### Data Protection
 - Validate all input data using Form Requests
@@ -252,6 +293,7 @@ Job-Portal/
 - Use prepared statements (Eloquent ORM)
 - Implement CSRF protection
 - Encrypt sensitive data
+- GDPR compliance measures
 
 #### File Uploads
 - Validate file types and sizes
@@ -261,12 +303,15 @@ Job-Portal/
 
 ### 10. Performance Standards
 
-#### Backend Performance
+**Refer to `/Docs/Requirements/technical_requirements.md` Section 3 for performance metrics**
+
+#### Backend Performance (TECH-PERF-*)
+- Page load time < 3 seconds
+- API response time < 500ms
 - Database query optimization with eager loading
 - Implement caching for frequently accessed data
 - Use queues for heavy operations (email, notifications)
-- Optimize images and file uploads
-- API response time < 200ms for 95% of requests
+- Support 1000+ concurrent users
 
 #### Frontend Performance
 - Lazy loading for components and routes
@@ -274,8 +319,11 @@ Job-Portal/
 - Minimize bundle size with code splitting
 - Implement virtual scrolling for large lists
 - Use CDN for static assets
+- Progressive Web App (PWA) capabilities
 
 ### 11. Subscription System Implementation
+
+**Refer to `/Docs/Requirements/functional_requirements.md` Section 6 for complete subscription features**
 
 #### Free Plan Limits
 - Maximum 3 job/project postings
@@ -283,31 +331,64 @@ Job-Portal/
 - Standard application features
 
 #### Premium Plans
+- Multiple tier configurations
 - Unlimited job/project postings
 - Featured and highlighted listings
 - Advanced candidate search
 - Full profile access
 - Priority support
+- Analytics access
 
-#### Payment Integration
+#### Payment Integration (TECH-INT-001 to TECH-INT-005)
 - Stripe/PayPal integration
 - Automated billing and renewals
 - Invoice generation
 - Payment history tracking
+- Webhook handling
+- Refund processing
 
 ### 12. Notification System
 
-#### Email Notifications
+**Refer to `/Docs/Requirements/functional_requirements.md` Section 5 for communication features**
+
+#### Email Notifications (REQ-COM-*)
 - Application status updates
 - New job matches for candidates
 - New applications for companies
 - Subscription reminders
+- Interview scheduling
 
 #### In-App Notifications
 - Real-time notifications using WebSockets/Pusher
 - Notification preferences management
 - Mark as read/unread functionality
 - Notification history
+
+### 13. Implementation Priority
+
+#### Phase 1: Foundation (Weeks 1-3)
+- Database setup as per `/Docs/Requirements/database_schema.md`
+- Authentication system (users table, roles)
+- Basic admin panel structure
+- User role management
+
+#### Phase 2: Core Functionality (Weeks 4-6)
+- Job and project management (REQ-CMP-005 to REQ-CMP-012)
+- Application workflow (REQ-CND-013 to REQ-CND-019)
+- Basic search and filtering (REQ-SRC-001 to REQ-SRC-005)
+- Company and candidate dashboards
+
+#### Phase 3: Advanced Features (Weeks 7-9)
+- Subscription system (REQ-PAY-001 to REQ-SUB-005)
+- Advanced search capabilities
+- Bookmark functionality
+- Website customization features (REQ-ADM-009 to REQ-ADM-012)
+
+#### Phase 4: Polish & Testing (Weeks 10-12)
+- UI/UX refinements
+- Performance optimization
+- Security testing
+- Bug fixes and documentation
 
 ## Quick Reference Commands
 
@@ -337,8 +418,10 @@ php artisan dusk
 
 ## Important Reminders
 
-- Always use TodoWrite tool for task tracking
-- Read the requirements documentation before starting any task
+- **ALWAYS** refer to `/Docs/Requirements/` for detailed specifications
+- Use TodoWrite tool for task tracking
+- Cross-reference with database_schema.md before creating migrations
+- Validate against user_stories.md during implementation
 - Follow the 3-tier architecture (Admin, Company, Candidate)
 - Implement proper validation and error handling
 - Write tests for all new features
@@ -347,8 +430,10 @@ php artisan dusk
 - Document all API endpoints
 - Use Laravel conventions and best practices
 - Test subscription limits and payment flows
+- Track which requirements are being implemented
 
 ---
 Last Updated: 2025-08-15
-Version: 1.0
+Version: 2.0
 Project: Multi-Role Job Portal Platform
+Documentation: Complete requirements in `/Docs/Requirements/`
