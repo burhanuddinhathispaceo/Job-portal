@@ -9,14 +9,9 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <h1 class="h3 mb-0">{{ __('admin.users.management') }}</h1>
-                <div>
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal">
-                        <i class="fas fa-file-import"></i> {{ __('admin.users.import') }}
-                    </button>
-                    <a href="{{ route('admin.users.bulk-export') }}" class="btn btn-info">
-                        <i class="fas fa-file-export"></i> {{ __('admin.users.export') }}
-                    </a>
-                </div>
+                <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus-circle"></i> {{ __('admin.create') }} {{ __('admin.users.title') }}
+                </a>
             </div>
         </div>
     </div>
@@ -221,39 +216,6 @@
             <div class="d-flex justify-content-center">
                 {{ $users->links() }}
             </div>
-        </div>
-    </div>
-</div>
-
-<!-- Import Modal -->
-<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="{{ route('admin.users.bulk-import') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="modal-header">
-                    <h5 class="modal-title" id="importModalLabel">{{ __('admin.users.import_users') }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>{{ __('admin.users.select_file') }}</label>
-                        <input type="file" name="file" class="form-control" accept=".csv,.xlsx,.xls" required>
-                        <small class="text-muted">{{ __('admin.users.import_help') }}</small>
-                    </div>
-                    <div class="form-group">
-                        <label>{{ __('admin.users.role') }}</label>
-                        <select name="role" class="form-control" required>
-                            <option value="company">{{ __('admin.users.company') }}</option>
-                            <option value="candidate">{{ __('admin.users.candidate') }}</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('admin.cancel') }}</button>
-                    <button type="submit" class="btn btn-primary">{{ __('admin.import') }}</button>
-                </div>
-            </form>
         </div>
     </div>
 </div>

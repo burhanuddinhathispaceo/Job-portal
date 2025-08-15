@@ -51,6 +51,8 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::middleware('admin:users.manage')->group(function () {
         // General Users
         Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
+        Route::get('/users/create', [UserManagementController::class, 'create'])->name('users.create');
+        Route::post('/users', [UserManagementController::class, 'store'])->name('users.store');
         Route::get('/users/{user}', [UserManagementController::class, 'show'])->name('users.show');
         Route::get('/users/{user}/edit', [UserManagementController::class, 'edit'])->name('users.edit');
         Route::put('/users/{user}', [UserManagementController::class, 'update'])->name('users.update');

@@ -59,6 +59,78 @@ class UserManagementController extends Controller
     }
 
     /**
+     * Show create user form
+     * Implements: REQ-ADM-001, REQ-ADM-002
+     */
+    public function create()
+    {
+        return view('admin.users.create');
+    }
+
+    /**
+     * Store a new user
+     * Implements: REQ-ADM-001, REQ-ADM-002
+     */
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users',
+            'mobile' => 'nullable|string|max:20|unique:users',
+            'password' => 'required|string|min:8',
+            'role' => 'required|in:admin,company,candidate',
+            'status' => 'required|in:active,inactive,suspended',
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'mobile' => $request->mobile,
+                'password' => Hash::make($request->password),
+                'role' => $request->role,
+                'status' => $request->status,
+                'email_verified_at' => $request->has('email_verified') ? now() : null,
+            ]);
+
+            // Create role-specific profile
+            if ($request->role === 'company') {
+                Company::create([
+                    'user_id' => $user->id,
+                    'company_name' => $request->name,
+                    'verification_status' => 'pending',
+                ]);
+            } elseif ($request->role === 'candidate') {
+                $nameParts = explode(' ', $request->name);
+                Candidate::create([
+                    'user_id' => $user->id,
+                    'first_name' => $nameParts[0] ?? '',
+                    'last_name' => $nameParts[1] ?? '',
+                    'profile_completion' => 10,
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()
+                ->route('admin.users.index')
+                ->with('success', 'User created successfully!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()
+                ->withErrors(['error' => 'Failed to create user: ' . $e->getMessage()])
+                ->withInput();
+        }
+    }
+
+    /**
      * Show user details
      * Implements: REQ-ADM-001, REQ-ADM-002
      */
@@ -248,72 +320,6 @@ class UserManagementController extends Controller
         }
     }
 
-    /**
-     * Bulk import users
-     * Implements: REQ-ADM-003
-     */
-    public function bulkImport(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|file|mimes:csv,xlsx,xls|max:5120', // 5MB max
-            'role' => 'required|in:company,candidate',
-        ]);
-
-        try {
-            // Process the uploaded file
-            $file = $request->file('file');
-            $importResults = $this->processUserImport($file, $request->role);
-
-            return response()->json([
-                'success' => true,
-                'message' => __('admin.users.import_completed'),
-                'results' => $importResults
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => __('admin.users.import_failed') . ': ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Bulk export users
-     * Implements: REQ-ADM-003
-     */
-    public function bulkExport(Request $request)
-    {
-        $request->validate([
-            'role' => 'nullable|in:admin,company,candidate',
-            'status' => 'nullable|in:active,inactive,suspended',
-            'format' => 'required|in:csv,xlsx',
-        ]);
-
-        try {
-            $query = User::with(['company', 'candidate']);
-
-            if ($request->filled('role')) {
-                $query->where('role', $request->role);
-            }
-
-            if ($request->filled('status')) {
-                $query->where('status', $request->status);
-            }
-
-            $users = $query->get();
-
-            $filename = 'users_export_' . now()->format('Y-m-d_H-i-s') . '.' . $request->format;
-
-            return $this->generateExportFile($users, $request->format, $filename);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => __('admin.users.export_failed') . ': ' . $e->getMessage()
-            ], 500);
-        }
-    }
 
     /**
      * Get user statistics for dashboard
@@ -333,31 +339,4 @@ class UserManagementController extends Controller
         return response()->json($stats);
     }
 
-    /**
-     * Process user import file
-     */
-    private function processUserImport($file, $role)
-    {
-        // Implementation would depend on chosen Excel/CSV library
-        // This is a placeholder for the actual import logic
-        return [
-            'total_rows' => 0,
-            'successful_imports' => 0,
-            'failed_imports' => 0,
-            'errors' => []
-        ];
-    }
-
-    /**
-     * Generate export file
-     */
-    private function generateExportFile($users, $format, $filename)
-    {
-        // Implementation would depend on chosen Excel/CSV library
-        // This is a placeholder for the actual export logic
-        return response()->json([
-            'success' => true,
-            'download_url' => '/admin/downloads/' . $filename
-        ]);
-    }
 }

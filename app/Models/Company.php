@@ -24,6 +24,9 @@ class Company extends Model
         'postal_code',
         'founded_year',
         'linkedin_url',
+        'verification_status',
+        'verified_at',
+        'verification_notes',
     ];
 
     protected $casts = [

@@ -27,7 +27,7 @@ class CompanyController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Company::with(['user', 'industry', 'subscription']);
+        $query = Company::with(['user', 'industry', 'subscriptions']);
 
         // Apply filters
         if ($request->filled('industry_id')) {
@@ -45,7 +45,7 @@ class CompanyController extends Controller
         }
 
         if ($request->filled('subscription_status')) {
-            $query->whereHas('subscription', function ($q) use ($request) {
+            $query->whereHas('subscriptions', function ($q) use ($request) {
                 $q->where('status', $request->subscription_status);
             });
         }
@@ -70,7 +70,7 @@ class CompanyController extends Controller
                 $q->where('status', 'active');
             })->count(),
             'verified_companies' => Company::where('verification_status', 'verified')->count(),
-            'premium_companies' => Company::whereHas('subscription', function ($q) {
+            'premium_companies' => Company::whereHas('subscriptions', function ($q) {
                 $q->where('status', 'active');
             })->count(),
         ];
@@ -89,7 +89,7 @@ class CompanyController extends Controller
         $company->load([
             'user',
             'industry',
-            'subscription.plan',
+            'subscriptions.plan',
             'jobs' => function ($query) {
                 $query->latest()->take(10);
             },
@@ -381,7 +381,7 @@ class CompanyController extends Controller
             'pending_verification' => Company::where('verification_status', 'pending')->count(),
             'verified_companies' => Company::where('verification_status', 'verified')->count(),
             'rejected_companies' => Company::where('verification_status', 'rejected')->count(),
-            'premium_companies' => Company::whereHas('subscription', function ($q) {
+            'premium_companies' => Company::whereHas('subscriptions', function ($q) {
                 $q->where('status', 'active');
             })->count(),
             'recent_registrations' => Company::where('created_at', '>=', now()->subDays(7))->count(),
@@ -408,62 +408,4 @@ class CompanyController extends Controller
         ]);
     }
 
-    /**
-     * Export companies data
-     */
-    public function export(Request $request)
-    {
-        $request->validate([
-            'format' => 'required|in:csv,xlsx',
-            'filters' => 'nullable|array',
-        ]);
-
-        try {
-            $query = Company::with(['user', 'industry', 'subscription']);
-
-            // Apply filters if provided
-            if ($request->has('filters')) {
-                $filters = $request->filters;
-                
-                if (!empty($filters['industry_id'])) {
-                    $query->where('industry_id', $filters['industry_id']);
-                }
-                
-                if (!empty($filters['company_size'])) {
-                    $query->where('company_size', $filters['company_size']);
-                }
-                
-                if (!empty($filters['status'])) {
-                    $query->whereHas('user', function ($q) use ($filters) {
-                        $q->where('status', $filters['status']);
-                    });
-                }
-            }
-
-            $companies = $query->get();
-
-            $filename = 'companies_export_' . now()->format('Y-m-d_H-i-s') . '.' . $request->format;
-
-            return $this->generateExportFile($companies, $request->format, $filename);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => __('admin.companies.export_failed') . ': ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Generate export file
-     */
-    private function generateExportFile($companies, $format, $filename)
-    {
-        // Implementation would depend on chosen Excel/CSV library
-        // This is a placeholder for the actual export logic
-        return response()->json([
-            'success' => true,
-            'download_url' => '/admin/downloads/' . $filename
-        ]);
-    }
 }
