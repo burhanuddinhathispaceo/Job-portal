@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\CandidateController;
 use App\Http\Controllers\Admin\JobController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\WebsiteController;
 use App\Http\Controllers\Admin\SubscriptionController;
 use App\Http\Controllers\Admin\PlanController;
 use App\Http\Controllers\Admin\AnalyticsController;
@@ -117,6 +118,13 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/settings/skills', [SettingsController::class, 'skills'])->name('settings.skills');
         Route::get('/settings/website', [SettingsController::class, 'websiteSettings'])->name('settings.website');
         Route::put('/settings/website', [SettingsController::class, 'updateWebsiteSettings'])->name('settings.update-website');
+        
+        // Website Customization
+        Route::get('/website', [WebsiteController::class, 'index'])->name('website.index');
+        Route::post('/website/appearance', [WebsiteController::class, 'updateAppearance'])->name('website.update-appearance');
+        Route::post('/website/branding', [WebsiteController::class, 'updateBranding'])->name('website.update-branding');
+        Route::post('/website/homepage', [WebsiteController::class, 'updateHomepage'])->name('website.update-homepage');
+        Route::post('/website/layout', [WebsiteController::class, 'updateLayout'])->name('website.update-layout');
     });
     
     // Subscription Management
