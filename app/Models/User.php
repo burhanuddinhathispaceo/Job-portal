@@ -103,4 +103,20 @@ class User extends Authenticatable
     {
         return $this->hasRole('candidate');
     }
+
+    /**
+     * Check if user is active
+     */
+    public function isActive(): bool
+    {
+        return $this->status === 'active';
+    }
+
+    /**
+     * Get user activities
+     */
+    public function activities()
+    {
+        return $this->hasMany(UserActivity::class);
+    }
 }
