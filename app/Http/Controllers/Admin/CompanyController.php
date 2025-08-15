@@ -81,6 +81,82 @@ class CompanyController extends Controller
     }
 
     /**
+     * Show create company form
+     * Implements: REQ-ADM-002
+     */
+    public function create()
+    {
+        $industries = Industry::where('is_active', true)->get();
+        
+        return view('admin.companies.create', compact('industries'));
+    }
+
+    /**
+     * Store new company
+     * Implements: REQ-ADM-002
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'company_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6',
+            'description' => 'nullable|string|max:5000',
+            'industry_id' => 'required|exists:industries,id',
+            'company_size' => 'nullable|in:1-10,11-50,51-200,201-500,500+',
+            'website' => 'nullable|url|max:255',
+            'address' => 'nullable|string|max:500',
+            'city' => 'nullable|string|max:100',
+            'state' => 'nullable|string|max:100',
+            'country' => 'nullable|string|max:100',
+            'postal_code' => 'nullable|string|max:20',
+            'founded_year' => 'nullable|integer|min:1800|max:' . date('Y'),
+            'linkedin_url' => 'nullable|url|max:255',
+            'logo' => 'nullable|image|max:2048',
+            'verification_status' => 'required|in:pending,verified,rejected',
+            'status' => 'required|in:active,inactive,suspended',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Create user account
+            $user = User::create([
+                'first_name' => $request->company_name,
+                'last_name' => '',
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
+                'role' => 'company',
+                'status' => $request->status,
+                'email_verified_at' => now(),
+            ]);
+
+            $companyData = $request->except(['email', 'password', 'status']);
+            $companyData['user_id'] = $user->id;
+
+            // Handle logo upload
+            if ($request->hasFile('logo')) {
+                $logoPath = $request->file('logo')->store('company-logos', 'public');
+                $companyData['logo'] = $logoPath;
+            }
+
+            $company = Company::create($companyData);
+
+            DB::commit();
+
+            return redirect()
+                ->route('admin.companies.show', $company)
+                ->with('success', __('admin.companies.created_successfully'));
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()
+                ->withErrors(['error' => __('admin.companies.creation_failed')])
+                ->withInput();
+        }
+    }
+
+    /**
      * Show company details
      * Implements: REQ-ADM-002
      */
@@ -366,6 +442,38 @@ class CompanyController extends Controller
             'monthly_data' => $monthlyData,
             'top_jobs' => $topJobs,
         ]);
+    }
+
+    /**
+     * Delete company
+     * Implements: REQ-ADM-002
+     */
+    public function destroy(Company $company)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Delete logo if exists
+            if ($company->logo && Storage::exists($company->logo)) {
+                Storage::delete($company->logo);
+            }
+
+            // Delete user account
+            $company->user->delete();
+            
+            // Company will be deleted by cascade
+
+            DB::commit();
+
+            return redirect()
+                ->route('admin.companies.index')
+                ->with('success', __('admin.companies.deleted_successfully'));
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()
+                ->withErrors(['error' => __('admin.companies.deletion_failed')]);
+        }
     }
 
     /**

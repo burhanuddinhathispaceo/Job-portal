@@ -65,48 +65,56 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
         
         // Companies
         Route::get('/companies', [CompanyController::class, 'index'])->name('companies.index');
+        Route::get('/companies/create', [CompanyController::class, 'create'])->name('companies.create');
+        Route::post('/companies', [CompanyController::class, 'store'])->name('companies.store');
         Route::get('/companies/{company}', [CompanyController::class, 'show'])->name('companies.show');
         Route::get('/companies/{company}/edit', [CompanyController::class, 'edit'])->name('companies.edit');
         Route::put('/companies/{company}', [CompanyController::class, 'update'])->name('companies.update');
+        Route::delete('/companies/{company}', [CompanyController::class, 'destroy'])->name('companies.destroy');
         Route::post('/companies/{company}/verify', [CompanyController::class, 'verify'])->name('companies.verify');
         Route::post('/companies/{company}/reject-verification', [CompanyController::class, 'rejectVerification'])->name('companies.reject-verification');
         Route::post('/companies/{company}/suspend', [CompanyController::class, 'suspend'])->name('companies.suspend');
         Route::get('/companies/{company}/analytics', [CompanyController::class, 'analytics'])->name('companies.analytics');
         Route::get('/companies/statistics', [CompanyController::class, 'getStatistics'])->name('companies.statistics');
-        Route::get('/companies/export', [CompanyController::class, 'export'])->name('companies.export');
         
         // Candidates
         Route::get('/candidates', [CandidateController::class, 'index'])->name('candidates.index');
+        Route::get('/candidates/create', [CandidateController::class, 'create'])->name('candidates.create');
+        Route::post('/candidates', [CandidateController::class, 'store'])->name('candidates.store');
         Route::get('/candidates/{candidate}', [CandidateController::class, 'show'])->name('candidates.show');
         Route::get('/candidates/{candidate}/edit', [CandidateController::class, 'edit'])->name('candidates.edit');
         Route::put('/candidates/{candidate}', [CandidateController::class, 'update'])->name('candidates.update');
+        Route::delete('/candidates/{candidate}', [CandidateController::class, 'destroy'])->name('candidates.destroy');
         Route::post('/candidates/{candidate}/suspend', [CandidateController::class, 'suspend'])->name('candidates.suspend');
         Route::get('/candidates/{candidate}/analytics', [CandidateController::class, 'analytics'])->name('candidates.analytics');
         Route::get('/candidates/statistics', [CandidateController::class, 'getStatistics'])->name('candidates.statistics');
-        Route::get('/candidates/export', [CandidateController::class, 'export'])->name('candidates.export');
     });
     
     // Content Management
     Route::middleware('admin')->group(function () {
         // Jobs
         Route::get('/jobs', [JobController::class, 'index'])->name('jobs.index');
+        Route::get('/jobs/create', [JobController::class, 'create'])->name('jobs.create');
+        Route::post('/jobs', [JobController::class, 'store'])->name('jobs.store');
         Route::get('/jobs/{job}', [JobController::class, 'show'])->name('jobs.show');
         Route::get('/jobs/{job}/edit', [JobController::class, 'edit'])->name('jobs.edit');
         Route::put('/jobs/{job}', [JobController::class, 'update'])->name('jobs.update');
+        Route::delete('/jobs/{job}', [JobController::class, 'destroy'])->name('jobs.destroy');
         Route::post('/jobs/{job}/change-status', [JobController::class, 'changeStatus'])->name('jobs.change-status');
         Route::post('/jobs/{job}/change-visibility', [JobController::class, 'changeVisibility'])->name('jobs.change-visibility');
-        Route::delete('/jobs/{job}', [JobController::class, 'destroy'])->name('jobs.destroy');
         Route::get('/jobs/{job}/analytics', [JobController::class, 'analytics'])->name('jobs.analytics');
         Route::get('/jobs/statistics', [JobController::class, 'getStatistics'])->name('jobs.statistics');
         Route::get('/jobs/export', [JobController::class, 'export'])->name('jobs.export');
         
         // Projects
         Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
+        Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
+        Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
         Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
         Route::get('/projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
         Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
-        Route::post('/projects/{project}/change-status', [ProjectController::class, 'changeStatus'])->name('projects.change-status');
         Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+        Route::post('/projects/{project}/change-status', [ProjectController::class, 'changeStatus'])->name('projects.change-status');
         Route::get('/projects/statistics', [ProjectController::class, 'getStatistics'])->name('projects.statistics');
     });
     

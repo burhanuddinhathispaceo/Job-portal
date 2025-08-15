@@ -82,6 +82,77 @@ class ProjectController extends Controller
     }
 
     /**
+     * Show create project form
+     * Implements: REQ-ADM-006
+     */
+    public function create()
+    {
+        $companies = Company::select('id', 'company_name')->get();
+        $projectTypes = ProjectType::where('is_active', true)->get();
+        
+        return view('admin.projects.create', compact('companies', 'projectTypes'));
+    }
+
+    /**
+     * Store new project
+     * Implements: REQ-ADM-006
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'company_id' => 'required|exists:companies,id',
+            'project_type_id' => 'required|exists:project_types,id',
+            'description' => 'required|string',
+            'requirements' => 'nullable|string',
+            'location' => 'nullable|string|max:255',
+            'budget_min' => 'nullable|numeric|min:0',
+            'budget_max' => 'nullable|numeric|min:0|gte:budget_min',
+            'duration_months' => 'nullable|integer|min:1|max:60',
+            'skills' => 'nullable|string',
+            'application_deadline' => 'nullable|date|after:today',
+            'status' => 'required|in:active,inactive,closed',
+            'visibility' => 'required|in:public,featured,highlighted,private',
+            'is_remote' => 'boolean',
+            'is_urgent' => 'boolean',
+        ]);
+
+        try {
+            $projectData = $request->all();
+            $projectData['is_remote'] = $request->boolean('is_remote');
+            $projectData['is_urgent'] = $request->boolean('is_urgent');
+            
+            $project = Project::create($projectData);
+
+            // Handle skills if provided
+            if ($request->filled('skills')) {
+                $skillNames = array_map('trim', explode(',', $request->skills));
+                $skillIds = [];
+                
+                foreach ($skillNames as $skillName) {
+                    if (!empty($skillName)) {
+                        $skill = Skill::firstOrCreate(['name' => $skillName]);
+                        $skillIds[] = $skill->id;
+                    }
+                }
+                
+                if (!empty($skillIds)) {
+                    $project->skills()->sync($skillIds);
+                }
+            }
+
+            return redirect()
+                ->route('admin.projects.show', $project)
+                ->with('success', __('admin.projects.created_successfully'));
+
+        } catch (\Exception $e) {
+            return back()
+                ->withErrors(['error' => __('admin.projects.creation_failed')])
+                ->withInput();
+        }
+    }
+
+    /**
      * Show project details
      */
     public function show(Project $project)

@@ -88,4 +88,28 @@ class Candidate extends Model
     {
         return $this->applications()->whereNotNull('project_id');
     }
+
+    /**
+     * Get the bookmarks for the candidate via user relationship
+     */
+    public function bookmarks()
+    {
+        return $this->user->bookmarks();
+    }
+
+    /**
+     * Get job bookmarks for the candidate
+     */
+    public function jobBookmarks()
+    {
+        return $this->user->bookmarks()->where('bookmarkable_type', 'App\\Models\\Job');
+    }
+
+    /**
+     * Get project bookmarks for the candidate
+     */
+    public function projectBookmarks()
+    {
+        return $this->user->bookmarks()->where('bookmarkable_type', 'App\\Models\\Project');
+    }
 }

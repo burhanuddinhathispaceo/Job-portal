@@ -100,6 +100,82 @@ class JobController extends Controller
     }
 
     /**
+     * Show create job form
+     * Implements: REQ-ADM-005
+     */
+    public function create()
+    {
+        $companies = Company::select('id', 'company_name')->get();
+        $jobTypes = JobType::where('is_active', true)->get();
+        $industries = Industry::where('is_active', true)->get();
+        
+        return view('admin.jobs.create', compact('companies', 'jobTypes', 'industries'));
+    }
+
+    /**
+     * Store new job
+     * Implements: REQ-ADM-005
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'company_id' => 'required|exists:companies,id',
+            'job_type_id' => 'required|exists:job_types,id',
+            'description' => 'required|string',
+            'requirements' => 'nullable|string',
+            'location' => 'nullable|string|max:255',
+            'salary_min' => 'nullable|numeric|min:0',
+            'salary_max' => 'nullable|numeric|min:0|gte:salary_min',
+            'salary_type' => 'required|in:yearly,monthly,hourly',
+            'employment_type' => 'required|in:full_time,part_time,contract,freelance,internship',
+            'experience_level' => 'nullable|in:entry,mid,senior,executive',
+            'skills' => 'nullable|string',
+            'application_deadline' => 'nullable|date|after:today',
+            'available_positions' => 'required|integer|min:1|max:100',
+            'status' => 'required|in:active,inactive,closed',
+            'visibility' => 'required|in:public,featured,highlighted,private',
+            'is_remote' => 'boolean',
+            'is_urgent' => 'boolean',
+            'industry_id' => 'nullable|exists:industries,id',
+        ]);
+
+        try {
+            $jobData = $request->all();
+            $jobData['is_remote'] = $request->boolean('is_remote');
+            $jobData['is_urgent'] = $request->boolean('is_urgent');
+            
+            $job = Job::create($jobData);
+
+            // Handle skills if provided
+            if ($request->filled('skills')) {
+                $skillNames = array_map('trim', explode(',', $request->skills));
+                $skillIds = [];
+                
+                foreach ($skillNames as $skillName) {
+                    if (!empty($skillName)) {
+                        $skill = Skill::firstOrCreate(['name' => $skillName]);
+                        $skillIds[] = $skill->id;
+                    }
+                }
+                
+                if (!empty($skillIds)) {
+                    $job->skills()->sync($skillIds);
+                }
+            }
+
+            return redirect()
+                ->route('admin.jobs.show', $job)
+                ->with('success', __('admin.jobs.created_successfully'));
+
+        } catch (\Exception $e) {
+            return back()
+                ->withErrors(['error' => __('admin.jobs.creation_failed')])
+                ->withInput();
+        }
+    }
+
+    /**
      * Show job details
      * Implements: REQ-ADM-005
      */
