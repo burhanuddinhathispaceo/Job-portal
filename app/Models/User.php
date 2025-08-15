@@ -21,6 +21,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'mobile',
+        'status',
+        'preferred_locale',
     ];
 
     /**
@@ -41,5 +45,62 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'last_login_at' => 'datetime',
     ];
+
+    /**
+     * Get the company profile for the user (if role is company)
+     */
+    public function company()
+    {
+        return $this->hasOne(Company::class);
+    }
+
+    /**
+     * Get the candidate profile for the user (if role is candidate)
+     */
+    public function candidate()
+    {
+        return $this->hasOne(Candidate::class);
+    }
+
+    /**
+     * Get user's bookmarks
+     */
+    public function bookmarks()
+    {
+        return $this->hasMany(Bookmark::class);
+    }
+
+    /**
+     * Check if user has a specific role
+     */
+    public function hasRole(string $role): bool
+    {
+        return $this->role === $role;
+    }
+
+    /**
+     * Check if user is admin
+     */
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('admin');
+    }
+
+    /**
+     * Check if user is company
+     */
+    public function isCompany(): bool
+    {
+        return $this->hasRole('company');
+    }
+
+    /**
+     * Check if user is candidate
+     */
+    public function isCandidate(): bool
+    {
+        return $this->hasRole('candidate');
+    }
 }
