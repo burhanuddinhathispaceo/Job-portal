@@ -1,0 +1,97 @@
+# Laravel
+/vendor/
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Laravel 4 specific
+bootstrap/compiled.php
+app/storage/
+
+# Laravel 5 & Lumen specific
+public/storage
+public/hot
+storage/*.key
+.env
+Homestead.yaml
+Homestead.json
+/.vagrant
+.phpunit.result.cache
+
+# Laravel IDE helper
+_ide_helper.php
+_ide_helper_models.php
+.phpstorm.meta.php
+
+# Vue.js
+.DS_Store
+node_modules/
+/dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+/test/unit/coverage/
+/test/e2e/reports/
+selenium-debug.log
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS Files
+.DS_Store
+Thumbs.db
+*.log
+
+# Testing
+/coverage
+.nyc_output
+
+# Production builds
+/build
+/public/build
+/public/css
+/public/js
+/public/mix-manifest.json
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# Backup files
+*.backup
+*.bak
+*~
+
+# Uploaded files
+/storage/app/public/
+/public/uploads/
+
+# Composer
+composer.phar
+
+# Environment files
+.env.backup
+.env.production
+
+# Cache files
+/.sass-cache
+/connect.lock
+/libpeerconnection.log
+testem.log
+
+# Documentation build
+/docs/_build/
+/docs/.vuepress/dist/
+
+# Temporary files
+*.tmp
+*.temp
+.temp/
+.tmp/
